@@ -1,0 +1,12 @@
+<RCC>
+    <!-- Stylesheets are embedded at compile time -->
+    <qresource prefix="/styles">
+        <file>resources/styles/dark.qss</file>
+        <file>resources/styles/light.qss</file>
+    </qresource>
+    <!--
+    Translation .qm files are generated from .ts files by 'lrelease'
+    and loaded at runtime from the application directory (see main.cpp).
+    They are NOT embedded here to avoid build-order issues.
+    -->
+</RCC>
