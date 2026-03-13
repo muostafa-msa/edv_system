@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginPage</class>
+ <widget class="QWidget" name="LoginPage">
+  <property name="windowTitle"><string>Login</string></property>
+  <layout class="QHBoxLayout" name="outerLayout">
+   <property name="margin"><number>0</number></property>
+   <property name="spacing"><number>0</number></property>
+
+   <!-- LEFT BRAND PANEL (60%) -->
+   <item>
+    <widget class="QWidget" name="brandPanel">
+     <property name="objectName"><string>loginBrandPanel</string></property>
+     <layout class="QVBoxLayout" name="brandLayout">
+      <property name="margin"><number>64</number></property>
+      <property name="spacing"><number>12</number></property>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      <item>
+       <widget class="QLabel" name="logoLabel">
+        <property name="text"><string>EDV Enterprise System</string></property>
+        <property name="objectName"><string>loginLogoText</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="sloganLabel">
+        <property name="text"><string>ENTERPRISE RESOURCE PLANNING</string></property>
+        <property name="objectName"><string>loginSloganText</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>32</height></size></property></spacer></item>
+      <item>
+       <widget class="QLabel" name="featureLabel">
+        <property name="text"><string>✦  Universal Journal (ACDOCA)\n✦  Connection Pooling\n✦  RBAC 4-Level Security\n✦  Finance · Sales · Inventory · HR · Production</string></property>
+        <property name="objectName"><string>loginFeatureList</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      <item>
+       <widget class="QLabel" name="copyrightLabel">
+        <property name="text"><string>EDV Enterprise System v2.0  ·  © 2025</string></property>
+        <property name="objectName"><string>loginCopyright</string></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- RIGHT FORM PANEL (40%) -->
+   <item>
+    <widget class="QWidget" name="formPanel">
+     <property name="objectName"><string>loginFormPanel</string></property>
+     <property name="minimumWidth"><number>420</number></property>
+     <property name="maximumWidth"><number>480</number></property>
+     <layout class="QVBoxLayout" name="formLayout">
+      <property name="margin"><number>64</number></property>
+      <property name="spacing"><number>0</number></property>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+      <item>
+       <widget class="QLabel" name="welcomeLabel">
+        <property name="text"><string>Welcome back</string></property>
+        <property name="objectName"><string>loginWelcomeText</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>6</height></size></property></spacer></item>
+      <item>
+       <widget class="QLabel" name="signInLabel">
+        <property name="text"><string>Sign in to your account</string></property>
+        <property name="objectName"><string>loginSectionTitle</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>36</height></size></property></spacer></item>
+
+      <!-- Username -->
+      <item>
+       <widget class="QLabel" name="usernameLabel">
+        <property name="text"><string>Username</string></property>
+        <property name="objectName"><string>loginFieldLabel</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>6</height></size></property></spacer></item>
+      <item>
+       <widget class="QLineEdit" name="usernameEdit">
+        <property name="placeholderText"><string>Enter your username</string></property>
+        <property name="minimumHeight"><number>46</number></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>16</height></size></property></spacer></item>
+
+      <!-- Password -->
+      <item>
+       <widget class="QLabel" name="passwordLabel">
+        <property name="text"><string>Password</string></property>
+        <property name="objectName"><string>loginFieldLabel</string></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>6</height></size></property></spacer></item>
+      <item>
+       <widget class="QLineEdit" name="passwordEdit">
+        <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+        <property name="placeholderText"><string>Enter your password</string></property>
+        <property name="minimumHeight"><number>46</number></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>12</height></size></property></spacer></item>
+
+      <!-- Language -->
+      <item>
+       <layout class="QHBoxLayout">
+        <item>
+         <widget class="QLabel" name="languageLabel">
+          <property name="text"><string>Language:</string></property>
+          <property name="objectName"><string>loginFieldLabel</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="languageCombo">
+          <item><property name="text"><string>English</string></property></item>
+          <item><property name="text"><string>Deutsch</string></property></item>
+          <item><property name="text"><string>العربية</string></property></item>
+         </widget>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+       </layout>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>8</height></size></property></spacer></item>
+
+      <!-- Error -->
+      <item>
+       <widget class="QLabel" name="errorLabel">
+        <property name="text"><string/></property>
+        <property name="objectName"><string>errorLabel</string></property>
+        <property name="wordWrap"><bool>true</bool></property>
+        <property name="minimumHeight"><number>24</number></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>8</height></size></property></spacer></item>
+
+      <!-- Sign in button -->
+      <item>
+       <widget class="QPushButton" name="loginBtn">
+        <property name="text"><string>Sign In</string></property>
+        <property name="objectName"><string>primaryButton</string></property>
+        <property name="minimumHeight"><number>50</number></property>
+        <property name="default"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Expanding</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>40</height></size></property></spacer></item>
+
+      <!-- DB settings link -->
+      <item>
+       <widget class="QPushButton" name="dbSettingsBtn">
+        <property name="text"><string>⚙  Database Settings</string></property>
+        <property name="objectName"><string>secondaryButton</string></property>
+        <property name="minimumHeight"><number>40</number></property>
+        <property name="flat"><bool>false</bool></property>
+       </widget>
+      </item>
+      <item><spacer><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

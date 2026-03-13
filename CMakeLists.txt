@@ -1,97 +1,128 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
-project(edv_system VERSION 0.1 LANGUAGES CXX)
+project(EDVEnterpriseSystem
+    VERSION 2.0.0
+    DESCRIPTION "EDV Enterprise Resource Planning System"
+    LANGUAGES CXX
+)
 
+# ── C++20 ──────────────────────────────────────────────────────────────────────
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# ── Qt Auto-tools ──────────────────────────────────────────────────────────────
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Charts PrintSupport LinguistTools)
-
-set(TS_FILES
-    translations/edv_system_de.ts
-    translations/edv_system_ar.ts
-    translations/edv_system_en.ts
+# ── Qt6 ────────────────────────────────────────────────────────────────────────
+find_package(Qt6 6.4 REQUIRED COMPONENTS
+    Core
+    Gui
+    Widgets
+    Sql
+    Charts
+    PrintSupport
+    Concurrent
+    LinguistTools
 )
 
-set(PROJECT_SOURCES
-    main.cpp
-    mainwindow.h
-    mainwindow.cpp
-    core/AppSettings.h
-    core/DatabaseManager.h
-    core/DatabaseManager.cpp
-    core/DbConnectionDialog.h
-    core/DbConnectionDialog.cpp
-    core/LoginDialog.h
-    core/LoginDialog.cpp
-    ui/DashboardWidget.h
+# SerialPort is optional (used by WmsScanner barcode module)
+find_package(Qt6 QUIET COMPONENTS SerialPort)
+if(Qt6SerialPort_FOUND)
+    message(STATUS "Qt6::SerialPort found — WmsScanner barcode support enabled")
+else()
+    message(WARNING "Qt6::SerialPort NOT found — WmsScanner barcode support disabled")
+endif()
+
+# ── Global include dirs ────────────────────────────────────────────────────────
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/core
+)
+
+# ── Translations ───────────────────────────────────────────────────────────────
+set(TS_FILES
+    translations/edv_en.ts
+    translations/edv_de.ts
+    translations/edv_ar.ts
+)
+
+# ── Sub-libraries ──────────────────────────────────────────────────────────────
+add_subdirectory(core)
+add_subdirectory(modules/fico)
+add_subdirectory(modules/sd)
+add_subdirectory(modules/mm)
+add_subdirectory(modules/pp)
+add_subdirectory(modules/hr)
+
+# ── Main executable ────────────────────────────────────────────────────────────
+set(APP_SOURCES
+    app/main.cpp
+
+    # UI layer
+    ui/LoginPage.ui
+    ui/LoginPage.hpp
+    ui/LoginPage.cpp
+    ui/MainWindow.ui
+    ui/MainWindow.hpp
+    ui/MainWindow.cpp
+    ui/DashboardWidget.ui
+    ui/DashboardWidget.hpp
     ui/DashboardWidget.cpp
-    ui/CrmWidget.h
-    ui/CrmWidget.cpp
-    ui/InventoryWidget.h
-    ui/InventoryWidget.cpp
-    ui/HrWidget.h
-    ui/HrWidget.cpp
-    ui/FinanceWidget.h
-    ui/FinanceWidget.cpp
-    ui/SettingsWidget.h
-    ui/SettingsWidget.cpp
-    models/CustomerModel.h
-    models/CustomerModel.cpp
+    ui/DbSetupDialog.ui
+    ui/DbSetupDialog.hpp
+    ui/DbSetupDialog.cpp
+
     resources.qrc
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(edv_system
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-else()
-    if(ANDROID)
-        add_library(edv_system SHARED ${PROJECT_SOURCES})
-    else()
-        add_executable(edv_system ${PROJECT_SOURCES})
-    endif()
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
+qt6_add_executable(edv_system
+    ${APP_SOURCES}
+)
 
-# Note: qt_create_translation already generates .qm files inside the build
-# directory, which is the same folder as the executable. No copy needed.
+qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+set_target_properties(edv_system PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
+)
 
 target_include_directories(edv_system PRIVATE
     ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/core
     ${CMAKE_SOURCE_DIR}/ui
-    ${CMAKE_SOURCE_DIR}/models
+    ${CMAKE_SOURCE_DIR}/core
+    ${CMAKE_SOURCE_DIR}/modules/fico
+    ${CMAKE_SOURCE_DIR}/modules/sd
+    ${CMAKE_SOURCE_DIR}/modules/mm
+    ${CMAKE_SOURCE_DIR}/modules/pp
+    ${CMAKE_SOURCE_DIR}/modules/hr
 )
 
 target_link_libraries(edv_system PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Sql
-    Qt${QT_VERSION_MAJOR}::Charts
-    Qt${QT_VERSION_MAJOR}::PrintSupport
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Sql
+    Qt6::Charts
+    Qt6::PrintSupport
+    Qt6::Concurrent
+    EnterpriseCore
+    ModuleFico
+    ModuleSd
+    ModuleMm
+    ModulePp
+    ModuleHr
 )
 
-set_target_properties(edv_system PROPERTIES
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
-
+# ── Install ────────────────────────────────────────────────────────────────────
 include(GNUInstallDirs)
 install(TARGETS edv_system
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(edv_system)
-endif()

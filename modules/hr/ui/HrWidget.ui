@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HrWidget</class>
+ <widget class="QWidget" name="HrWidget">
+  <property name="windowTitle"><string>Human Resources</string></property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="margin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <!-- Tab 1: Employees -->
+     <widget class="QWidget" name="employeesTab">
+      <attribute name="title"><string>Employees</string></attribute>
+      <layout class="QVBoxLayout" name="empLayout">
+       <property name="margin"><number>16</number></property>
+       <property name="spacing"><number>12</number></property>
+       <item>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QLineEdit" name="empSearchEdit">
+           <property name="placeholderText"><string>Search employee...</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addEmpBtn">
+           <property name="text"><string>+ Add Employee</string></property>
+           <property name="objectName"><string>primaryButton</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="empRefreshBtn">
+           <property name="text"><string>↻</string></property>
+           <property name="objectName"><string>iconButton</string></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="employeeTable">
+         <property name="objectName"><string>dataTable</string></property>
+         <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+         <property name="alternatingRowColors"><bool>true</bool></property>
+         <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+         <column><property name="text"><string>Emp. No.</string></property></column>
+         <column><property name="text"><string>Name</string></property></column>
+         <column><property name="text"><string>Department</string></property></column>
+         <column><property name="text"><string>Position</string></property></column>
+         <column><property name="text"><string>Cost Center</string></property></column>
+         <column><property name="text"><string>Salary (EUR)</string></property></column>
+         <column><property name="text"><string>Hire Date</string></property></column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <!-- Tab 2: Payroll -->
+     <widget class="QWidget" name="payrollTab">
+      <attribute name="title"><string>Payroll</string></attribute>
+      <layout class="QVBoxLayout" name="payrollLayout">
+       <property name="margin"><number>16</number></property>
+       <property name="spacing"><number>12</number></property>
+       <item>
+        <widget class="QFrame" name="payrollCard">
+         <property name="objectName"><string>card</string></property>
+         <layout class="QVBoxLayout" name="payrollCardLayout">
+          <property name="margin"><number>20</number></property>
+          <property name="spacing"><number>12</number></property>
+          <item>
+           <widget class="QLabel" name="payrollTitle">
+            <property name="text"><string>Payroll Runs</string></property>
+            <property name="objectName"><string>cardTitle</string></property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout">
+            <item>
+             <widget class="QLabel" name="periodLabel"><property name="text"><string>Period:</string></property></widget>
+            </item>
+            <item>
+             <widget class="QDateEdit" name="payPeriodEdit">
+              <property name="displayFormat"><string>yyyy-MM</string></property>
+              <property name="calendarPopup"><bool>false</bool></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="runPayrollBtn">
+              <property name="text"><string>Run Payroll</string></property>
+              <property name="objectName"><string>primaryButton</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="postPayrollBtn">
+              <property name="text"><string>Post to FICO</string></property>
+              <property name="objectName"><string>secondaryButton</string></property>
+             </widget>
+            </item>
+            <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="payrollRunsTable">
+            <property name="objectName"><string>dataTable</string></property>
+            <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+            <property name="alternatingRowColors"><bool>true</bool></property>
+            <column><property name="text"><string>Pay Period</string></property></column>
+            <column><property name="text"><string>Gross Pay</string></property></column>
+            <column><property name="text"><string>Tax</string></property></column>
+            <column><property name="text"><string>Social Security</string></property></column>
+            <column><property name="text"><string>Net Pay</string></property></column>
+            <column><property name="text"><string>Status</string></property></column>
+            <column><property name="text"><string>Journal Doc</string></property></column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

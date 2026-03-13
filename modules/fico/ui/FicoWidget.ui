@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FicoWidget</class>
+ <widget class="QWidget" name="FicoWidget">
+  <property name="windowTitle"><string>Finance &amp; Controlling</string></property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="margin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="toolbarLayout">
+     <item>
+      <widget class="QLabel" name="titleLabel">
+       <property name="text"><string>Journal Entries</string></property>
+       <property name="objectName"><string>sectionTitle</string></property>
+      </widget>
+     </item>
+     <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+     <item>
+      <widget class="QLineEdit" name="searchEdit">
+       <property name="placeholderText"><string>Search by document number or description...</string></property>
+       <property name="minimumWidth"><number>280</number></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="docTypeFilter">
+       <item><property name="text"><string>All Types</string></property></item>
+       <item><property name="text"><string>SA — GL Entry</string></property></item>
+       <item><property name="text"><string>DR — Customer</string></property></item>
+       <item><property name="text"><string>KR — Vendor</string></property></item>
+       <item><property name="text"><string>WE — Goods Receipt</string></property></item>
+       <item><property name="text"><string>WA — Goods Issue</string></property></item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="newEntryBtn">
+       <property name="text"><string>+ New Entry</string></property>
+       <property name="objectName"><string>primaryButton</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reverseBtn">
+       <property name="text"><string>Reverse</string></property>
+       <property name="objectName"><string>secondaryButton</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="refreshBtn">
+       <property name="text"><string>↻</string></property>
+       <property name="objectName"><string>iconButton</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="journalTable">
+     <property name="objectName"><string>dataTable</string></property>
+     <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+     <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+     <property name="alternatingRowColors"><bool>true</bool></property>
+     <property name="sortingEnabled"><bool>true</bool></property>
+    </widget>
+   </item>
+   <!-- Trial Balance section -->
+   <item>
+    <widget class="QFrame" name="trialBalanceCard">
+     <property name="objectName"><string>card</string></property>
+     <property name="maximumHeight"><number>280</number></property>
+     <layout class="QVBoxLayout" name="tbLayout">
+      <property name="margin"><number>16</number></property>
+      <item>
+       <layout class="QHBoxLayout">
+        <item>
+         <widget class="QLabel" name="tbTitle">
+          <property name="text"><string>Trial Balance</string></property>
+          <property name="objectName"><string>cardTitle</string></property>
+         </widget>
+        </item>
+        <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+        <item>
+         <widget class="QDateEdit" name="tbFromDate">
+          <property name="calendarPopup"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item><widget class="QLabel" name="toLabel"><property name="text"><string>to</string></property></widget></item>
+        <item>
+         <widget class="QDateEdit" name="tbToDate">
+          <property name="calendarPopup"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="runTbBtn">
+          <property name="text"><string>Run</string></property>
+          <property name="objectName"><string>secondaryButton</string></property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="trialBalanceTable">
+        <property name="objectName"><string>dataTable</string></property>
+        <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+        <property name="alternatingRowColors"><bool>true</bool></property>
+        <column><property name="text"><string>GL Code</string></property></column>
+        <column><property name="text"><string>Account</string></property></column>
+        <column><property name="text"><string>Debit</string></property></column>
+        <column><property name="text"><string>Credit</string></property></column>
+        <column><property name="text"><string>Balance</string></property></column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

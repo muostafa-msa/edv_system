@@ -1,14 +1,16 @@
-#include "DashboardWidget.h"
+#include "DashboardWidget.hpp"
+#include "ui_DashboardWidget.h"
+#include "core/database/DatabaseManager.hpp"
 
-#include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGridLayout>
-#include <QLabel>
+#include <QVBoxLayout>
 #include <QFrame>
-#include <QPushButton>
-#include <QScrollArea>
+#include <QFont>
+#include <QDate>
 #include <QSqlQuery>
-#include <QDateTime>
+#include <QHeaderView>
+#include <QTableWidgetItem>
+#include <QPainter>
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QChart>
@@ -19,264 +21,245 @@
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
 
-#include "core/DatabaseManager.h"
-
-DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
+DashboardWidget::DashboardWidget(QWidget *parent)
+    : QWidget(parent), ui(new Ui::DashboardWidget)
 {
-    setupUi();
+    ui->setupUi(this);
+    buildKpiRow();
+    buildChartsRow();
     refresh();
 }
 
-void DashboardWidget::setupUi()
+DashboardWidget::~DashboardWidget() { delete ui; }
+
+// ── KPI cards ─────────────────────────────────────────────────────────────────
+
+QWidget* DashboardWidget::createKpiCard(const QString& title, const QString& value,
+                                         const QString& subtitle, const QString& color)
 {
-    auto *scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
-    scroll->setFrameShape(QFrame::NoFrame);
-
-    auto *content = new QWidget(scroll);
-    scroll->setWidget(content);
-
-    auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(0, 0, 0, 0);
-    root->addWidget(scroll);
-
-    auto *layout = new QVBoxLayout(content);
-    layout->setContentsMargins(24, 24, 24, 24);
-    layout->setSpacing(20);
-
-    // ---- Page header ----
-    auto *hdr = new QLabel(tr("Dashboard"), content);
-    QFont hf;
-    hf.setPointSize(20);
-    hf.setBold(true);
-    hdr->setFont(hf);
-    layout->addWidget(hdr);
-
-    auto *dateLbl = new QLabel(QDateTime::currentDateTime().toString("dddd, d MMMM yyyy"), content);
-    dateLbl->setObjectName("secondaryText");
-    layout->addWidget(dateLbl);
-
-    // ---- KPI cards ----
-    auto *kpiRow = new QHBoxLayout;
-    kpiRow->setSpacing(16);
-
-    auto *custCard  = createKpiCard(tr("Total Customers"),   "—", tr("Active accounts"), "#1F6FEB");
-    auto *orderCard = createKpiCard(tr("Open Orders"),       "—", tr("Pending fulfillment"), "#2EA043");
-    auto *stockCard = createKpiCard(tr("Low Stock Items"),   "—", tr("Below minimum level"), "#D29922");
-    auto *revCard   = createKpiCard(tr("Monthly Revenue"),   "— EUR", tr("Current month"), "#8957E5");
-
-    // Grab the value labels for refresh()
-    m_customersVal = custCard->findChild<QLabel*>("kpiValue");
-    m_ordersVal    = orderCard->findChild<QLabel*>("kpiValue");
-    m_lowStockVal  = stockCard->findChild<QLabel*>("kpiValue");
-    m_revenueVal   = revCard->findChild<QLabel*>("kpiValue");
-
-    kpiRow->addWidget(custCard);
-    kpiRow->addWidget(orderCard);
-    kpiRow->addWidget(stockCard);
-    kpiRow->addWidget(revCard);
-    layout->addLayout(kpiRow);
-
-    // ---- Charts ----
-    auto *chartsRow = new QHBoxLayout;
-    chartsRow->setSpacing(16);
-
-    // Revenue bar chart
-    auto *revenueGroup = new QFrame(content);
-    revenueGroup->setObjectName("card");
-    auto *rgLayout = new QVBoxLayout(revenueGroup);
-    rgLayout->setContentsMargins(16, 16, 16, 16);
-    auto *rvTitle = new QLabel(tr("Monthly Revenue (EUR)"), revenueGroup);
-    rvTitle->setObjectName("cardTitle");
-    rgLayout->addWidget(rvTitle);
-
-    m_revenueChart = new QChartView(revenueGroup);
-    m_revenueChart->setMinimumHeight(240);
-    m_revenueChart->setRenderHint(QPainter::Antialiasing);
-    rgLayout->addWidget(m_revenueChart);
-    chartsRow->addWidget(revenueGroup, 2);
-
-    // Orders pie chart
-    auto *ordersGroup = new QFrame(content);
-    ordersGroup->setObjectName("card");
-    auto *ogLayout = new QVBoxLayout(ordersGroup);
-    ogLayout->setContentsMargins(16, 16, 16, 16);
-    auto *orTitle = new QLabel(tr("Orders by Status"), ordersGroup);
-    orTitle->setObjectName("cardTitle");
-    ogLayout->addWidget(orTitle);
-
-    m_ordersChart = new QChartView(ordersGroup);
-    m_ordersChart->setMinimumHeight(240);
-    m_ordersChart->setRenderHint(QPainter::Antialiasing);
-    ogLayout->addWidget(m_ordersChart);
-    chartsRow->addWidget(ordersGroup, 1);
-
-    layout->addLayout(chartsRow);
-    layout->addStretch();
-}
-
-QWidget *DashboardWidget::createKpiCard(const QString &title, const QString &value,
-                                         const QString &subtitle, const QString &color)
-{
-    auto *card = new QFrame(this);
+    auto* card = new QFrame(this);
     card->setObjectName("card");
 
-    auto *cl = new QVBoxLayout(card);
+    auto* cl = new QVBoxLayout(card);
     cl->setContentsMargins(20, 20, 20, 20);
-    cl->setSpacing(4);
+    cl->setSpacing(6);
 
-    // Color bar at top
-    auto *bar = new QFrame(card);
+    auto* bar = new QFrame(card);
     bar->setFixedHeight(4);
-    bar->setStyleSheet(QString("background: %1; border-radius: 2px;").arg(color));
+    bar->setStyleSheet(QString("background:%1; border-radius:2px;").arg(color));
     cl->addWidget(bar);
-    cl->addSpacing(8);
+    cl->addSpacing(6);
 
-    auto *titleLbl = new QLabel(title, card);
+    auto* titleLbl = new QLabel(title, card);
     titleLbl->setObjectName("kpiTitle");
 
-    auto *valLbl = new QLabel(value, card);
+    auto* valLbl = new QLabel(value, card);
     valLbl->setObjectName("kpiValue");
-    QFont vf;
-    vf.setPointSize(28);
-    vf.setBold(true);
+    QFont vf; vf.setPointSize(26); vf.setBold(true);
     valLbl->setFont(vf);
-    valLbl->setStyleSheet(QString("color: %1;").arg(color));
+    valLbl->setStyleSheet(QString("color:%1;").arg(color));
 
-    auto *subLbl = new QLabel(subtitle, card);
+    auto* subLbl = new QLabel(subtitle, card);
     subLbl->setObjectName("kpiSubtitle");
 
     cl->addWidget(titleLbl);
     cl->addWidget(valLbl);
     cl->addWidget(subLbl);
-
     return card;
 }
+
+void DashboardWidget::buildKpiRow()
+{
+    auto* row = new QHBoxLayout(ui->kpiRow);
+    row->setSpacing(16);
+
+    auto* c1 = createKpiCard(tr("Total Customers"),  "—",      tr("Active accounts"),      "#1F6FEB");
+    auto* c2 = createKpiCard(tr("Open Orders"),      "—",      tr("Pending fulfillment"),   "#2EA043");
+    auto* c3 = createKpiCard(tr("Low Stock Items"),  "—",      tr("Below reorder point"),   "#D29922");
+    auto* c4 = createKpiCard(tr("Monthly Revenue"),  "— EUR",  tr("Current month"),         "#8957E5");
+
+    m_customersVal = c1->findChild<QLabel*>("kpiValue");
+    m_ordersVal    = c2->findChild<QLabel*>("kpiValue");
+    m_lowStockVal  = c3->findChild<QLabel*>("kpiValue");
+    m_revenueVal   = c4->findChild<QLabel*>("kpiValue");
+
+    row->addWidget(c1); row->addWidget(c2);
+    row->addWidget(c3); row->addWidget(c4);
+}
+
+void DashboardWidget::buildChartsRow()
+{
+    auto* row = new QHBoxLayout(ui->chartsRow);
+    row->setSpacing(16);
+
+    auto* revCard = new QFrame(this);
+    revCard->setObjectName("card");
+    auto* revLayout = new QVBoxLayout(revCard);
+    revLayout->setContentsMargins(16,16,16,16);
+    auto* revTitle = new QLabel(tr("Monthly Revenue (EUR)"), revCard);
+    revTitle->setObjectName("cardTitle");
+    m_revenueChart = new QChartView(revCard);
+    m_revenueChart->setMinimumHeight(260);
+    m_revenueChart->setRenderHint(QPainter::Antialiasing);
+    revLayout->addWidget(revTitle);
+    revLayout->addWidget(m_revenueChart);
+    row->addWidget(revCard, 3);
+
+    auto* ordCard = new QFrame(this);
+    ordCard->setObjectName("card");
+    auto* ordLayout = new QVBoxLayout(ordCard);
+    ordLayout->setContentsMargins(16,16,16,16);
+    auto* ordTitle = new QLabel(tr("Orders by Status"), ordCard);
+    ordTitle->setObjectName("cardTitle");
+    m_ordersChart = new QChartView(ordCard);
+    m_ordersChart->setMinimumHeight(260);
+    m_ordersChart->setRenderHint(QPainter::Antialiasing);
+    ordLayout->addWidget(ordTitle);
+    ordLayout->addWidget(m_ordersChart);
+    row->addWidget(ordCard, 2);
+}
+
+// ── Refresh ───────────────────────────────────────────────────────────────────
 
 void DashboardWidget::refresh()
 {
     loadKpiData();
+    loadRevenueChart();
+    loadOrdersChart();
+    loadRecentPostings();
+}
 
-    // ---- Revenue bar chart ----
-    auto *barSet = new QBarSet(tr("Revenue"));
+void DashboardWidget::loadKpiData()
+{
+    auto token = DatabaseManager::instance().acquire();
+    if (!token) return;
+    QSqlDatabase db = token->connection();
+
+    {
+        QSqlQuery q(db);
+        q.exec("SELECT COUNT(*) FROM customers WHERE is_active=true");
+        if (q.next() && m_customersVal) m_customersVal->setText(q.value(0).toString());
+    }
+    {
+        QSqlQuery q(db);
+        q.exec("SELECT COUNT(*) FROM sales_orders WHERE status IN ('confirmed','picking','shipped')");
+        if (q.next() && m_ordersVal) m_ordersVal->setText(q.value(0).toString());
+    }
+    {
+        QSqlQuery q(db);
+        q.exec("SELECT COUNT(*) FROM stock_levels WHERE quantity_on_hand < reorder_point AND reorder_point > 0");
+        if (q.next() && m_lowStockVal) m_lowStockVal->setText(q.value(0).toString());
+    }
+    {
+        QSqlQuery q(db);
+        q.exec(
+            "SELECT COALESCE(ABS(SUM(f.amount)),0) "
+            "FROM fact_universal_journal f "
+            "JOIN chart_of_accounts c ON c.gl_code=f.gl_account "
+            "WHERE c.account_type='Revenue' "
+            "  AND DATE_TRUNC('month',f.posting_date)=DATE_TRUNC('month',CURRENT_DATE)"
+        );
+        if (q.next() && m_revenueVal)
+            m_revenueVal->setText(QString("%1 EUR").arg(q.value(0).toDouble(), 0, 'f', 0));
+    }
+}
+
+void DashboardWidget::loadRevenueChart()
+{
+    auto token = DatabaseManager::instance().acquire();
+    if (!token) return;
+
+    auto* barSet = new QBarSet(tr("Revenue"));
     barSet->setColor(QColor("#1F6FEB"));
 
     QStringList months;
-    QSqlQuery q(DatabaseManager::instance().database());
+    QSqlQuery q(token->connection());
     q.exec(
-        "SELECT TO_CHAR(order_date,'Mon') AS month, COALESCE(SUM(total_gross),0) "
-        "FROM sales_orders "
-        "WHERE order_date >= DATE_TRUNC('year', CURRENT_DATE) "
-        "  AND status NOT IN ('cancelled','draft') "
-        "GROUP BY 1, DATE_PART('month', order_date) "
-        "ORDER BY DATE_PART('month', order_date)"
+        "SELECT TO_CHAR(f.posting_date,'Mon') AS month, "
+        "       COALESCE(ABS(SUM(f.amount)),0) "
+        "FROM fact_universal_journal f "
+        "JOIN chart_of_accounts c ON c.gl_code=f.gl_account "
+        "WHERE c.account_type='Revenue' "
+        "  AND DATE_PART('year',f.posting_date)=DATE_PART('year',CURRENT_DATE) "
+        "GROUP BY 1, DATE_PART('month',f.posting_date) "
+        "ORDER BY DATE_PART('month',f.posting_date)"
     );
     while (q.next()) {
         months << q.value(0).toString();
         *barSet << q.value(1).toDouble();
     }
-
-    // If no data, show sample
     if (months.isEmpty()) {
-        for (auto &m : {"Jan","Feb","Mar","Apr","May","Jun"}) {
-            months << m;
-            *barSet << 0;
-        }
+        for (const char* m : {"Jan","Feb","Mar","Apr","May","Jun"}) { months << m; *barSet << 0; }
     }
 
-    auto *series = new QBarSeries;
-    series->append(barSet);
-
-    auto *chart = new QChart;
+    auto* series = new QBarSeries; series->append(barSet);
+    auto* chart  = new QChart;
     chart->addSeries(series);
-    chart->setTitle("");
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chart->legend()->hide();
     chart->setBackgroundVisible(false);
-
-    auto *axisX = new QBarCategoryAxis;
-    axisX->append(months);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-
-    auto *axisY = new QValueAxis;
-    axisY->setLabelFormat("%.0f");
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
-
+    auto* axX = new QBarCategoryAxis; axX->append(months);
+    chart->addAxis(axX, Qt::AlignBottom); series->attachAxis(axX);
+    auto* axY = new QValueAxis; axY->setLabelFormat("%.0f");
+    chart->addAxis(axY, Qt::AlignLeft); series->attachAxis(axY);
     m_revenueChart->setChart(chart);
+}
 
-    // ---- Orders pie chart ----
-    auto *pie = new QPieSeries;
-    QSqlQuery pq(DatabaseManager::instance().database());
-    pq.exec(
-        "SELECT status, COUNT(*) FROM sales_orders "
-        "WHERE status NOT IN ('cancelled') "
-        "GROUP BY status ORDER BY status"
-    );
+void DashboardWidget::loadOrdersChart()
+{
+    auto token = DatabaseManager::instance().acquire();
+    if (!token) return;
 
-    bool hasPieData = false;
-    QStringList colors = {"#1F6FEB","#2EA043","#D29922","#8957E5","#F85149"};
-    int ci = 0;
-    while (pq.next()) {
-        hasPieData = true;
-        auto *sl = pie->append(pq.value(0).toString(), pq.value(1).toDouble());
+    auto* pie = new QPieSeries;
+    QSqlQuery q(token->connection());
+    q.exec("SELECT status, COUNT(*) FROM sales_orders WHERE status!='cancelled' GROUP BY status");
+
+    static const QStringList colors = {"#1F6FEB","#2EA043","#D29922","#8957E5","#F85149"};
+    int ci = 0; bool hasData = false;
+    while (q.next()) {
+        hasData = true;
+        auto* sl = pie->append(q.value(0).toString(), q.value(1).toDouble());
         sl->setColor(QColor(colors.value(ci++ % colors.size())));
         sl->setLabelVisible(true);
     }
-    if (!hasPieData)
-        pie->append(tr("No Data"), 1.0);
+    if (!hasData) pie->append(tr("No Data"), 1.0);
 
-    auto *pieChart = new QChart;
-    pieChart->addSeries(pie);
-    pieChart->setTitle("");
-    pieChart->setAnimationOptions(QChart::SeriesAnimations);
-    pieChart->legend()->setAlignment(Qt::AlignBottom);
-    pieChart->setBackgroundVisible(false);
-
-    m_ordersChart->setChart(pieChart);
+    auto* chart = new QChart;
+    chart->addSeries(pie);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->setBackgroundVisible(false);
+    m_ordersChart->setChart(chart);
 }
 
-void DashboardWidget::loadKpiData()
+void DashboardWidget::loadRecentPostings()
 {
-    auto db = DatabaseManager::instance().database();
+    auto token = DatabaseManager::instance().acquire();
+    if (!token) return;
 
-    // Total active customers
-    {
-        QSqlQuery q(db);
-        q.exec("SELECT COUNT(*) FROM customers WHERE is_active=true");
-        if (q.next() && m_customersVal)
-            m_customersVal->setText(q.value(0).toString());
-    }
+    auto* tbl = ui->activityTable;
+    tbl->setRowCount(0);
+    tbl->horizontalHeader()->setStretchLastSection(true);
 
-    // Open orders
-    {
-        QSqlQuery q(db);
-        q.exec("SELECT COUNT(*) FROM sales_orders WHERE status IN ('draft','confirmed','shipped')");
-        if (q.next() && m_ordersVal)
-            m_ordersVal->setText(q.value(0).toString());
-    }
+    QSqlQuery q(token->connection());
+    q.exec(
+        "SELECT h.document_number, h.document_type, h.posting_date, "
+        "       SUM(CASE WHEN f.amount>0 THEN f.amount ELSE 0 END), h.header_text "
+        "FROM journal_document_header h "
+        "JOIN fact_universal_journal f ON f.document_number=h.document_number "
+        "GROUP BY h.document_number, h.document_type, h.posting_date, h.header_text "
+        "ORDER BY h.created_at DESC LIMIT 20"
+    );
 
-    // Low stock
-    {
-        QSqlQuery q(db);
-        q.exec(
-            "SELECT COUNT(*) FROM stock_levels "
-            "WHERE quantity_on_hand < min_stock AND min_stock > 0"
-        );
-        if (q.next() && m_lowStockVal)
-            m_lowStockVal->setText(q.value(0).toString());
-    }
-
-    // Monthly revenue
-    {
-        QSqlQuery q(db);
-        q.exec(
-            "SELECT COALESCE(SUM(total_gross),0) FROM sales_orders "
-            "WHERE DATE_TRUNC('month', order_date) = DATE_TRUNC('month', CURRENT_DATE) "
-            "  AND status NOT IN ('cancelled','draft')"
-        );
-        if (q.next() && m_revenueVal)
-            m_revenueVal->setText(QString("%1 EUR").arg(q.value(0).toDouble(), 0, 'f', 0));
+    int row = 0;
+    while (q.next()) {
+        tbl->insertRow(row);
+        tbl->setItem(row, 0, new QTableWidgetItem(q.value(0).toString()));
+        tbl->setItem(row, 1, new QTableWidgetItem(q.value(1).toString()));
+        tbl->setItem(row, 2, new QTableWidgetItem(q.value(2).toDate().toString("yyyy-MM-dd")));
+        tbl->setItem(row, 3, new QTableWidgetItem(
+            QString("%1 EUR").arg(q.value(3).toDouble(), 0, 'f', 2)));
+        tbl->setItem(row, 4, new QTableWidgetItem(q.value(4).toString()));
+        ++row;
     }
 }

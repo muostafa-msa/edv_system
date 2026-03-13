@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MmWidget</class>
+ <widget class="QWidget" name="MmWidget">
+  <property name="windowTitle"><string>Materials Management</string></property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="margin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <!-- Tab 1: Stock Levels -->
+     <widget class="QWidget" name="stockTab">
+      <attribute name="title"><string>Stock Levels</string></attribute>
+      <layout class="QVBoxLayout" name="stockLayout">
+       <property name="margin"><number>16</number></property>
+       <property name="spacing"><number>12</number></property>
+       <item>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QLineEdit" name="stockSearchEdit">
+           <property name="placeholderText"><string>Search material...</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="warehouseFilter">
+           <item><property name="text"><string>All Warehouses</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="stockRefreshBtn">
+           <property name="text"><string>↻</string></property>
+           <property name="objectName"><string>iconButton</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="goodsReceiptBtn">
+           <property name="text"><string>+ Goods Receipt</string></property>
+           <property name="objectName"><string>primaryButton</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="goodsIssueBtn">
+           <property name="text"><string>− Goods Issue</string></property>
+           <property name="objectName"><string>secondaryButton</string></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="stockTable">
+         <property name="objectName"><string>dataTable</string></property>
+         <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+         <property name="alternatingRowColors"><bool>true</bool></property>
+         <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+         <column><property name="text"><string>Material No.</string></property></column>
+         <column><property name="text"><string>Description</string></property></column>
+         <column><property name="text"><string>Warehouse</string></property></column>
+         <column><property name="text"><string>Qty on Hand</string></property></column>
+         <column><property name="text"><string>UoM</string></property></column>
+         <column><property name="text"><string>Reorder Point</string></property></column>
+         <column><property name="text"><string>Status</string></property></column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <!-- Tab 2: WMS Scanner -->
+     <widget class="QWidget" name="scannerTab">
+      <attribute name="title"><string>WMS Scanner</string></attribute>
+      <layout class="QVBoxLayout" name="scannerLayout">
+       <property name="margin"><number>24</number></property>
+       <property name="spacing"><number>16</number></property>
+       <item>
+        <widget class="QFrame" name="scannerCard">
+         <property name="objectName"><string>card</string></property>
+         <layout class="QVBoxLayout" name="scannerCardLayout">
+          <property name="margin"><number>20</number></property>
+          <property name="spacing"><number>12</number></property>
+          <item>
+           <layout class="QHBoxLayout">
+            <item>
+             <widget class="QLabel" name="portLabel"><property name="text"><string>Port:</string></property></widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="portCombo"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="connectPortBtn">
+              <property name="text"><string>Connect</string></property>
+              <property name="objectName"><string>primaryButton</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="disconnectPortBtn">
+              <property name="text"><string>Disconnect</string></property>
+              <property name="objectName"><string>secondaryButton</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="testScanBtn">
+              <property name="text"><string>Test Scan</string></property>
+             </widget>
+            </item>
+            <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+            <item>
+             <widget class="QLabel" name="portStatusLabel">
+              <property name="text"><string>● Not connected</string></property>
+              <property name="objectName"><string>statusLabel</string></property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lastBarcodeLabel">
+            <property name="text"><string>Last scan: —</string></property>
+            <property name="objectName"><string>lastBarcodeDisplay</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="scanLogTable">
+            <property name="objectName"><string>dataTable</string></property>
+            <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+            <property name="alternatingRowColors"><bool>true</bool></property>
+            <property name="minimumHeight"><number>200</number></property>
+            <column><property name="text"><string>Time</string></property></column>
+            <column><property name="text"><string>Barcode</string></property></column>
+            <column><property name="text"><string>Material</string></property></column>
+            <column><property name="text"><string>Action</string></property></column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <!-- Tab 3: AI Reorder -->
+     <widget class="QWidget" name="reorderTab">
+      <attribute name="title"><string>AI Reorder</string></attribute>
+      <layout class="QVBoxLayout" name="reorderLayout">
+       <property name="margin"><number>16</number></property>
+       <property name="spacing"><number>12</number></property>
+       <item>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QLabel" name="lookbackLabel"><property name="text"><string>Lookback (days):</string></property></widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="lookbackSpin">
+           <property name="minimum"><number>7</number></property>
+           <property name="maximum"><number>365</number></property>
+           <property name="value"><number>90</number></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="leadLabel"><property name="text"><string>Lead time (days):</string></property></widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="leadTimeSpin">
+           <property name="minimum"><number>1</number></property>
+           <property name="maximum"><number>90</number></property>
+           <property name="value"><number>14</number></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="runReorderBtn">
+           <property name="text"><string>Run Analysis</string></property>
+           <property name="objectName"><string>primaryButton</string></property>
+          </widget>
+         </item>
+         <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="reorderTable">
+         <property name="objectName"><string>dataTable</string></property>
+         <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+         <property name="alternatingRowColors"><bool>true</bool></property>
+         <column><property name="text"><string>!</string></property></column>
+         <column><property name="text"><string>Material</string></property></column>
+         <column><property name="text"><string>Warehouse</string></property></column>
+         <column><property name="text"><string>Stock</string></property></column>
+         <column><property name="text"><string>Avg Daily</string></property></column>
+         <column><property name="text"><string>Projected</string></property></column>
+         <column><property name="text"><string>Safety Stock</string></property></column>
+         <column><property name="text"><string>Suggest Order</string></property></column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

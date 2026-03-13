@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SdWidget</class>
+ <widget class="QWidget" name="SdWidget">
+  <property name="windowTitle"><string>Sales &amp; Distribution</string></property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="margin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+   <!-- Toolbar -->
+   <item>
+    <layout class="QHBoxLayout" name="toolbarLayout">
+     <item>
+      <widget class="QLabel" name="titleLabel">
+       <property name="text"><string>Sales Orders</string></property>
+       <property name="objectName"><string>sectionTitle</string></property>
+      </widget>
+     </item>
+     <item><spacer><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+     <item>
+      <widget class="QLineEdit" name="searchEdit">
+       <property name="placeholderText"><string>Search by order number or customer...</string></property>
+       <property name="minimumWidth"><number>260</number></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="statusFilter">
+       <item><property name="text"><string>All Statuses</string></property></item>
+       <item><property name="text"><string>draft</string></property></item>
+       <item><property name="text"><string>confirmed</string></property></item>
+       <item><property name="text"><string>picking</string></property></item>
+       <item><property name="text"><string>shipped</string></property></item>
+       <item><property name="text"><string>invoiced</string></property></item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="newOrderBtn">
+       <property name="text"><string>+ New Order</string></property>
+       <property name="objectName"><string>primaryButton</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="confirmBtn">
+       <property name="text"><string>Confirm</string></property>
+       <property name="objectName"><string>secondaryButton</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="invoiceBtn">
+       <property name="text"><string>Post Invoice</string></property>
+       <property name="objectName"><string>secondaryButton</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="refreshBtn">
+       <property name="text"><string>↻</string></property>
+       <property name="objectName"><string>iconButton</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <!-- Splitter: orders list + line items -->
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <widget class="QTableView" name="ordersTable">
+      <property name="objectName"><string>dataTable</string></property>
+      <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+      <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+      <property name="alternatingRowColors"><bool>true</bool></property>
+      <property name="sortingEnabled"><bool>true</bool></property>
+     </widget>
+     <widget class="QFrame" name="lineItemsCard">
+      <property name="objectName"><string>card</string></property>
+      <layout class="QVBoxLayout" name="lineLayout">
+       <property name="margin"><number>16</number></property>
+       <item>
+        <widget class="QLabel" name="lineItemsTitle">
+         <property name="text"><string>Order Line Items</string></property>
+         <property name="objectName"><string>cardTitle</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="lineItemsTable">
+         <property name="objectName"><string>dataTable</string></property>
+         <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+         <property name="alternatingRowColors"><bool>true</bool></property>
+         <column><property name="text"><string>#</string></property></column>
+         <column><property name="text"><string>Material</string></property></column>
+         <column><property name="text"><string>Qty</string></property></column>
+         <column><property name="text"><string>UoM</string></property></column>
+         <column><property name="text"><string>Unit Price</string></property></column>
+         <column><property name="text"><string>Disc %</string></property></column>
+         <column><property name="text"><string>Net Amount</string></property></column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>
